@@ -93,5 +93,5 @@ class Utils:
         fut_csv_df = pd.concat([fut_csv_df, fut_df]) \
         .sort_index() \
         .groupby(level=0, sort=False) \
-        .last()
+        .first()
         return fut_csv_df

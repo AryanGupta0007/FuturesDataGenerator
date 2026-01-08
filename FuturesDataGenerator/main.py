@@ -30,7 +30,7 @@ def main(ORB_URL, ORB_PASSWORD, ORB_USERNAME, FUT_CSV_PATH):
     
     fut_csv_df = Utils.generate_synthetic_futures_data(fut_csv_df)
     final_df = Utils.get_final_df(fut_csv_df, fut_df)
-    return final_df
+    return final_df.drop(columns=["diff"])
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
