@@ -1,0 +1,8 @@
+*.zip
+2h_data/
+res/
+ABB/*
+*.csv
+myenv/
+__pycache__/
+.env
