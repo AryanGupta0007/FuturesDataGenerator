@@ -1,6 +1,6 @@
-import polars as pl
 import pandas as pd
-prod=True
+from datetime import timedelta
+prod=False
 if prod:
     from .Utils import Utils
 else:
@@ -23,14 +23,25 @@ def main(ORB_URL, ORB_PASSWORD, ORB_USERNAME, FUT_CSV_PATH):
     fut_df.set_index('ti', inplace=True)
     spot_df.set_index('ti', inplace=True)
     fut_csv_df.set_index('ti', inplace=True)
+    
     spot_df = spot_df[~spot_df.index.duplicated(keep='last')]
     fut_csv_df = fut_csv_df[~fut_csv_df.index.duplicated(keep='last')]
-    fut_csv_df['diff'] = fut_csv_df['c'] - spot_df['c']
-    fut_df['diff'] = fut_df['c'] - spot_df['c']
-    
-    fut_csv_df = Utils.generate_synthetic_futures_data(fut_csv_df)
-    final_df = Utils.get_final_df(fut_csv_df, fut_df)
-    return final_df.drop(columns=["diff"])
+    spot_df['diff'] = spot_df['o'] - fut_csv_df['o']
+    spot_df['diff'] = spot_df['diff'].ffill()
+    cols = ['o', 'h', 'l', 'c']
+    for col in cols:
+        spot_df[f'{col}_f'] = spot_df[col] - spot_df['diff']
+    final_df = spot_df.drop(columns=cols)
+    final_df['sym'] = symbols['FUT']
+    final_df['inst'] = 'sf'
+    final_df = final_df.rename(columns={
+            "o_f": "o",
+            "h_f": "h",
+            "l_f": "l",
+            "c_f": "c"
+        })
+    print(final_df.shape, spot_df.shape)    
+    return final_df.drop(columns=['diff', 'datetime']).to_csv('ABB_FUT - Copy (2)_output.csv')
 
 if __name__ == "__main__":
     from dotenv import load_dotenv

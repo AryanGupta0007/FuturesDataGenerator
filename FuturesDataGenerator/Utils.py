@@ -1,6 +1,7 @@
 import pandas as pd
 import polars as pl
 import DataFeederM
+from datetime import timedelta
 
 class Utils:
     @staticmethod
@@ -28,6 +29,7 @@ class Utils:
 
         fut_csv_df = fut_csv_df.set_index('datetime').sort_index().reset_index()
         fut_csv_pl = pl.from_pandas(fut_csv_df)
+        
         fut_csv_pl = fut_csv_pl.with_columns([
             pl.col('datetime').dt.epoch().alias('ti')
         ])
@@ -36,11 +38,14 @@ class Utils:
         ])
 
         fut_csv_pl = fut_csv_pl.with_columns([
-            (pl.col('ti') + 1800).alias('ti'),
+            (pl.col('ti') - int((5.5 * 3600))).alias('ti'),
         ])
+        # print(fut_csv_pl['ti'])
+        # import sys 
+        # sys.exit()
         epochs = [fut_csv_pl.row(0)[-1], fut_csv_pl.row(len(fut_csv_pl)-1)[-1]]
         fut_csv_df = fut_csv_pl.to_pandas()
-        fut_csv_df = fut_csv_df.drop(columns=["datetime"])
+        # fut_csv_df = fut_csv_df.drop(columns=["datetime"])
         # print(fut_csv_df['ti'][0])
         return fut_csv_df, symbols, epochs
     
@@ -53,9 +58,13 @@ class Utils:
         dfs = {}
         for k, v in output.items():
             df = pd.DataFrame(v)
+            df["ti"] = df["ti"] 
+            df['datetime'] = pd.to_datetime(df["ti"], unit="s") + timedelta(hours=5, minutes=30)
+            # print(df)
             df.drop(columns=["_id"], inplace=True)
             dfs[k] = df
-        print(dfs)
+        
+        # print(dfs)
         return dfs[symbols["FUT"]], dfs[symbols["SPOT"]]
 
     @staticmethod
@@ -63,19 +72,22 @@ class Utils:
         new_rows = []
         fut_csv_df_ = fut_csv_df.reset_index()
         for i, row in fut_csv_df_.iterrows():
+            
             for minute in range(1, 120):
+                diff = round((row["diff"]), 2)
                 new_row = {
                 "sym": row["sym"],
                 "ti": row["ti"] + (minute * 60),
-                "o": row["o"] + row["diff"],
-                "h": row["h"] + row["diff"],
-                "l": row["l"] + row["diff"],
-                "c": row["c"] + row["diff"],
+                "o": round(row["o"] + diff, 2),
+                "h": round(row["h"] + diff, 2),
+                "l": round(row["l"] + diff, 2),
+                "c": round(row["c"] + diff, 2),
                 "v": 0,
                 "oi": 0,
                 "exg": "NSE",
                 "inst": "sf",
-                "diff": row["diff"]
+                "diff": diff,
+                "datetime": row["datetime"]
                 }
                 new_rows.append(new_row)
         synthetic_df = pd.DataFrame(new_rows)
@@ -95,3 +107,8 @@ class Utils:
         .groupby(level=0, sort=False) \
         .first()
         return fut_csv_df
+    
+    @staticmethod
+    def convert_ti_to_ist(df):
+        df.reset_index(inplace=True)
+        return df['ti'] + int(5.5 * 3600)
