@@ -39,9 +39,8 @@ def main(ORB_URL, ORB_PASSWORD, ORB_USERNAME, FUT_CSV_PATH):
             "h_f": "h",
             "l_f": "l",
             "c_f": "c"
-        })
-    print(final_df.shape, spot_df.shape)    
-    return final_df.drop(columns=['diff', 'datetime']).to_csv('ABB_FUT - Copy (2)_output.csv')
+        })    
+    return final_df.drop(columns=['diff', 'datetime'])
 
 if __name__ == "__main__":
     from dotenv import load_dotenv
