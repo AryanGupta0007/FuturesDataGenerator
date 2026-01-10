@@ -17,8 +17,9 @@ class Utils:
             "volume": "v",
             "symbol": "sym"
         })
+        print(fut_csv_df)
         fut_csv_df['oi'] = 0
-        fut_csv_df['datetime'] = pd.to_datetime(fut_csv_df['datetime'], dayfirst=True)
+        fut_csv_df['datetime'] = pd.to_datetime(fut_csv_df['datetime'], dayfirst=False)
         fut_csv_df['exg'] = 'NSE'
         fut_csv_df['inst'] = 'sf'
         symbols = {
@@ -44,6 +45,9 @@ class Utils:
         # import sys 
         # sys.exit()
         epochs = [fut_csv_pl.row(0)[-1], fut_csv_pl.row(len(fut_csv_pl)-1)[-1]]
+        # print(epochs)
+        # import sys 
+        # sys.exit()
         fut_csv_df = fut_csv_pl.to_pandas()
         # fut_csv_df = fut_csv_df.drop(columns=["datetime"])
         # print(fut_csv_df['ti'][0])
@@ -55,15 +59,27 @@ class Utils:
     
     @staticmethod
     def get_fut_and_spot_df(output, symbols):
-        dfs = {}
-        for k, v in output.items():
-            df = pd.DataFrame(v)
-            df["ti"] = df["ti"] 
-            df['datetime'] = pd.to_datetime(df["ti"], unit="s") + timedelta(hours=5, minutes=30)
-            # print(df)
-            df.drop(columns=["_id"], inplace=True)
-            dfs[k] = df
+        try:
+            dfs = {}
+            dfs[symbols["FUT"]], dfs[symbols["SPOT"]] = None, None
+            
+            for k, v in output.items():
+                df = pd.DataFrame(v)
+                df["ti"] = df["ti"] 
+                df['datetime'] = pd.to_datetime(df["ti"], unit="s") + timedelta(hours=5, minutes=30)
+                df.drop(columns=["_id"], inplace=True)
+                dfs[k] = df
+                print(k)
+                print(dfs[k])
+            # import sys
+            # sys.exit()
+        except Exception as e:
+            print(output)
+            print(dfs)
+            print(e)
         
+            # import sys 
+            # sys.exit()    
         # print(dfs)
         return dfs[symbols["FUT"]], dfs[symbols["SPOT"]]
 

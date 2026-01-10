@@ -3,11 +3,12 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # Load data
-spot_df = pd.read_csv("ABB.csv", index_col="ti")
-fut_df  = pd.read_csv("ABB_FUT - Copy (2)_output.csv", index_col="ti")
+spot_df = pd.read_csv("spot_df.csv", index_col="ti")
+fut_df  = pd.read_csv("output.csv", index_col="ti")
 
 # Filter epoch range
-start, end = 1705737960, 1713426240
+start, end = 1715246160, 1716975420
+
 spot_df = spot_df.loc[(spot_df.index > start) & (spot_df.index < end)]
 fut_df  = fut_df.loc[(fut_df.index > start) & (fut_df.index < end)]
 
