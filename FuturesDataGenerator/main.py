@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import timedelta
-prod=False
+prod=True
 if prod:
     from .Utils import Utils
 else:
@@ -38,7 +38,10 @@ def main(ORB_URL, ORB_PASSWORD, ORB_USERNAME, FUT_CSV_PATH):
     # spot_df['diff'] = spot_df['diff'].fillna(0)
     for col in cols:
         spot_df[f'{col}_f'] = spot_df[col] - spot_df['diff']
-    
+    # print(f"printing spot")
+    # print(org_spot_df["datetime"])
+    # import sys 
+    # sys.exit()
     final_df = spot_df.drop(columns=cols)
     final_df['sym'] = symbols['FUT']
     final_df['inst'] = 'sf'
@@ -65,6 +68,10 @@ def main(ORB_URL, ORB_PASSWORD, ORB_USERNAME, FUT_CSV_PATH):
         # print('updated_df')
         # print(final_df)
     final_df['oi'] = final_df['oi'].fillna(0)
+    final_df = final_df[
+        (final_df["datetime"].dt.strftime("%H:%M") >= "09:15") & (final_df["datetime"].dt.strftime("%H:%M") <= "15:30")
+    ]
+    # final_df = final_df[final_df[]]
     # spot_df['sym'] = symbols["SPOT"]
     return final_df.drop(columns=['diff']).sort_index().reset_index(), org_spot_df.sort_index().reset_index()
 

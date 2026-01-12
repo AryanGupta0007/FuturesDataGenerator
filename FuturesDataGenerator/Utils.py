@@ -17,7 +17,7 @@ class Utils:
             "volume": "v",
             "symbol": "sym"
         })
-        print(fut_csv_df)
+        # print(fut_csv_df)
         fut_csv_df['oi'] = 0
         fut_csv_df['datetime'] = pd.to_datetime(fut_csv_df['datetime'], dayfirst=False)
         fut_csv_df['exg'] = 'NSE'
@@ -69,8 +69,8 @@ class Utils:
                 df['datetime'] = pd.to_datetime(df["ti"], unit="s") + timedelta(hours=5, minutes=30)
                 df.drop(columns=["_id"], inplace=True)
                 dfs[k] = df
-                print(k)
-                print(dfs[k])
+                # print(k)
+                # print(dfs[k])
             # import sys
             # sys.exit()
         except Exception as e:
